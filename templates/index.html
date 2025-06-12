@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Listing Review</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+    }
+    img {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>تحسين وصف العقار باستخدام الذكاء الاصطناعي</h1>
+  <form id="aiForm">
+    <label for="description">الوصف الحالي:</label><br />
+    <textarea id="description" name="description"></textarea><br />
+    <label>
+      <input type="checkbox" id="agreeAI" name="agreeAI" />
+      أوافق على استخدام الذكاء الاصطناعي لتحسين الوصف
+    </label><br /><br />
+    <button type="submit">تحسين الوصف</button>
+  </form>
+
+  <div id="output"></div>
+
+  <script>
+    document.getElementById('aiForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData();
+      formData.append('description', document.getElementById('description').value);
+      formData.append('agreeAI', document.getElementById('agreeAI').checked);
+
+      try {
+        const res = await fetch('/ai-review', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          document.getElementById('output').innerHTML = `
+            <h3>الوصف المحسن:</h3>
+            <p>${data.description}</p>
+            <h4>صور محسنة:</h4>
+            ${data.image_urls.map(url => `<img src="${url}" width="100"/>`).join('')}
+          `;
+        } else {
+          document.getElementById('output').innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+        }
+      } catch (err) {
+        document.getElementById('output').innerHTML = `<p style="color:red;">Error submitting to AI: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
